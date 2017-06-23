@@ -1,6 +1,12 @@
 # rotonde-cli
 nodejs based cli for rotonde
 
+### Instructions
+Download these files, make sure you have the latest [nodejs](https://nodejs.org/en/download/) version installed, navigate to the folder you unpacked these files and then do
+1. `npm install`
+2. `./rotonde save <path to rotonde.json>`
+3. `./rotonde write "started using rotonde"`
+4. `./rotonde feed`
 
 ```sh
 Usage: rotonde [options] [command]
