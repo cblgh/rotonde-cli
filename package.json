@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "commander": "^2.10.0",
-    "osenv": "^0.1.4"
+    "osenv": "^0.1.4",
+    "request": "^2.81.0"
   }
 }
