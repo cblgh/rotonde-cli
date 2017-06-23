@@ -1,0 +1,83 @@
+#!/usr/bin/env node
+
+var fs = require("fs");
+var osenv = require("osenv");
+var path = require("path");
+var program = require("commander");
+var request = require("request");
+var util = require("./rotonde-utils.js");
+
+program.parse(process.argv);
+
+var newest = 0; // keeps track of the newest post for further polling
+var maxPosts = program.args[0];
+if (!maxPosts) {
+    maxPosts = 25;
+}
+
+
+function processFeed() {
+    util.data()
+    .then((rotondeItems) => {
+        return new Promise((resolve, reject) => {
+            var [rotonde, settings] = rotondeItems;
+
+            var posts = {};
+            var counter = 0;
+
+            function handleRequest(counter, name, data) {
+                posts[name] = JSON.parse(data);
+                // we've processed all of the portals, send the response
+                if (counter == rotonde["portal"].length - 1) {
+                    resolve(posts);
+                }
+            }
+
+            rotonde["portal"].forEach(function(portal) {
+                request(portal, function(err, resp, body) {
+                    handleRequest(counter++, portal, body);
+                });
+            });
+        });
+    }).then((posts) => {
+        var timeline = [];
+        for (domain in posts) {
+            var post = posts[domain];
+            post["feed"].forEach((entry) => {
+                timeline.push({"info": post["profile"], "entry": entry});
+            });
+        }
+        timeline.sort(compare); // sort feed so that we show the newest posts at the bottom
+        // rationale: we want to append new posts when we find them, 
+        // and this ordering allows that to look less weird
+        timeline = timeline.slice(timeline.length - maxPosts);
+
+        for (var i = 0; i < timeline.length; i++) {
+            var post = timeline[i];
+            if (parseInt(post["entry"]["time"]) > parseInt(newest)) {
+                newest = post["entry"]["time"];
+                console.log(post["info"]["name"] + ": " + post["entry"]["text"]);
+            } 
+        }
+    });
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function compare(a, b) {
+    if (a["entry"]["time"] < b["entry"]["time"]) {
+        return -1;
+    }
+    if (a["entry"]["time"] > b["entry"]["time"]) {
+        return 1;
+    }
+    return 0;
+}
+
+setImmediate(async function poll() {
+    processFeed();
+    await sleep(60000); // sleep for 60s between polls
+    setImmediate(poll);
+});

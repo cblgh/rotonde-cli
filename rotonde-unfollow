@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+var util = require("./rotonde-utils.js");
+var program = require("commander");
+var fs = require("fs");
+
+program.parse(process.argv);
+
+var portal = program.args[0];
+if (!portal) {
+    console.error("error: specify a portal to unfollow");
+    return;
+}
+
+util.data().then((rotondeItems) => {
+    var [rotonde, settings] = rotondeItems;
+    var index = rotonde["portal"].indexOf(portal);
+    if (index < 0) {
+        console.log("err: you aren't following", portal);
+        return;
+    }
+    rotonde["portal"].splice(rotonde["portal"].indexOf(portal), 1); // remove portal we want to unfollow
+    fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
+        if (err) { 
+            console.error("err: couldn't save to", settings["rotonde location"]);
+            console.error(err);
+            return;
+        }
+        console.log("no longer following", portal);
+    })
+})
+

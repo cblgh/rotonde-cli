@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+
+var program = require("commander");
+var fs = require("fs");
+var util = require("./rotonde-utils.js");
+
+program.parse(process.argv);
+
+var location = program.args[0];
+if (!location) {
+    console.error("error: the location to write on your profile");
+    return;
+}
+
+util.data().then((rotondeItems) => {
+    var [rotonde, settings] = rotondeItems;
+    rotonde["profile"]["location"] = location;
+    fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
+        if (err) { 
+            console.error("err: couldn't save to", settings["rotonde location"]);
+            console.error(err);
+            return;
+        }
+        console.log("your location was changed to", location);
+    })
+})
+

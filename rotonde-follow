@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+
+var util = require("./rotonde-utils.js");
+var program = require("commander");
+var fs = require("fs");
+
+program.parse(process.argv);
+
+var portal = program.args[0];
+if (!portal) {
+    console.error("error: specify a portal to follow");
+    return;
+}
+
+util.data().then((rotondeItems) => {
+    var [rotonde, settings] = rotondeItems;
+    if (rotonde["portal"].indexOf(portal) >= 0) {
+        console.log("already following", portal);
+        return;
+    }
+    rotonde["portal"].push(portal); // save the portal we want to follow
+    fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
+        if (err) { 
+            console.error("err: couldn't save portal to rotonde.json");
+            console.error(err);
+            return;
+        }
+        console.log("now following", portal);
+    })
+})
+
