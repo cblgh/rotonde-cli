@@ -8,7 +8,7 @@ module.exports = {
         return readSettings().then((settings) => {
             return new Promise((resolve, reject) => {
                 fs.readFile(settings["rotonde location"], (err, data) => {
-                    if (err) { reject(err) };
+                    if (err) { console.log("error reading rotonde location at ", settings["rotonde location"]); reject(err) };
                     resolve([JSON.parse(data), settings]); // parse rotonde info & pass along settings
                 });
             });
