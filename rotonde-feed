@@ -33,18 +33,19 @@ function processFeed() {
                         resolve(posts);
                     }
                 } catch (err) {
-                    resolve(err);
+                    console.log(name);
+                    console.log(err);
+                    reject(err);
                 }
             }
 
             rotonde["portal"].forEach(function(portal) {
-                request(portal, function(err, resp, body) {
+                portal = portal.replace(/^https?:\/\//, "").replace(/\/?$/, "");
+                request("http://" + portal, function(err, resp, body) {
                     handleRequest(counter++, portal, body);
                 });
             });
         });
-    }).catch((err) => {
-        console.log("err in json parsing?", err);
     }).then((posts) => {
         var timeline = [];
         for (domain in posts) {
@@ -73,10 +74,10 @@ function sleep(ms) {
 }
 
 function compare(a, b) {
-    if (a["entry"]["time"] < b["entry"]["time"]) {
+    if (parseInt(a["entry"]["time"]) < parseInt(b["entry"]["time"])) {
         return -1;
     }
-    if (a["entry"]["time"] > b["entry"]["time"]) {
+    if (parseInt(a["entry"]["time"]) > parseInt(b["entry"]["time"])) {
         return 1;
     }
     return 0;

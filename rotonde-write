@@ -16,7 +16,7 @@ if (!text) {
 util.data().then((rotondeItems) => {
     var [rotonde, settings] = rotondeItems;
     var hash = crypto.createHash("sha256").update(text).digest("hex");
-    rotonde["feed"].push({"text": text, "time": (new Date).getTime(), "id": hash});
+    rotonde["feed"].push({"text": text, "time": parseInt((new Date).getTime() / 1000), "id": hash});
     fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
         if (err) { 
             console.error("err: couldn't save to", settings["rotonde location"]);
