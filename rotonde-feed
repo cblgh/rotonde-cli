@@ -26,10 +26,14 @@ function processFeed() {
             var counter = 0;
 
             function handleRequest(counter, name, data) {
-                posts[name] = JSON.parse(data);
-                // we've processed all of the portals, send the response
-                if (counter == rotonde["portal"].length - 1) {
-                    resolve(posts);
+                try {
+                    posts[name] = JSON.parse(data);
+                    // we've processed all of the portals, send the response
+                    if (counter == rotonde["portal"].length - 1) {
+                        resolve(posts);
+                    }
+                } catch (err) {
+                    resolve(err);
                 }
             }
 
@@ -39,6 +43,8 @@ function processFeed() {
                 });
             });
         });
+    }).catch((err) => {
+        console.log("err in json parsing?", err);
     }).then((posts) => {
         var timeline = [];
         for (domain in posts) {
