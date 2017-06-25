@@ -22,7 +22,7 @@ Usage: rotonde [options] [command]
     color|c [color]        set your profile color
     write|w [entry]        write an entry
     erase|d [index]        remove an entry
-    feed|f [numbe]         view your feed
+    feed|f [number]        view your feed
     save|p                 save the location of your rotonde.json file
     help [cmd]             display help for [cmd]
-    ```
+```
