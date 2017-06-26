@@ -35,17 +35,21 @@ function processFeed() {
                 } catch (err) {
                     console.log(name);
                     console.log(err);
-                    reject(err);
+                    reject({err: err, feed: name});
                 }
             }
 
             rotonde["portal"].forEach(function(portal) {
-                portal = portal.replace(/^https?:\/\//, "").replace(/\/?$/, "");
-                request("http://" + portal, function(err, resp, body) {
+                var protocol = portal.substring(0, portal.indexOf("://")) || "http"; // extract protocol, assume http if missing
+                protocol += "://";
+                portal = portal.replace(/^.*:\/\//, "").replace(/\/?$/, ""); // remove protocol & trailing slash from name
+                request(protocol + portal, function(err, resp, body) {
                     handleRequest(counter++, portal, body);
                 });
             });
         });
+    }).catch((err) => {
+        console.log("encountered an error while requesting", err.feed);
     }).then((posts) => {
         var timeline = [];
         for (domain in posts) {
@@ -54,9 +58,10 @@ function processFeed() {
                 timeline.push({"info": post["profile"], "entry": entry});
             });
         }
-        timeline.sort(compare); // sort feed so that we show the newest posts at the bottom
+        // sort feed so that we show the newest posts at the bottom
         // rationale: we want to append new posts when we find them, 
         // and this ordering allows that to look less weird
+        timeline.sort(compare); 
         timeline = timeline.slice(timeline.length - maxPosts);
 
         for (var i = 0; i < timeline.length; i++) {
