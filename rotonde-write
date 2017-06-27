@@ -5,7 +5,10 @@ var program = require("commander");
 var fs = require("fs");
 var crypto = require("crypto");
 
-program.parse(process.argv);
+program
+    .option("-u, --url [url]", "link to add to post")
+    .option("-m, --media [media]", "media to link to in post (jpg, mp3)")
+    .parse(process.argv);
 
 var text = program.args[0];
 if (!text) {
@@ -16,7 +19,12 @@ if (!text) {
 util.data().then((rotondeItems) => {
     var [rotonde, settings] = rotondeItems;
     var hash = crypto.createHash("sha256").update(text).digest("hex");
-    rotonde["feed"].push({"text": text, "time": parseInt((new Date).getTime() / 1000), "id": hash});
+    var entry = {"text": text, "time": parseInt((new Date).getTime() / 1000), "id": hash}
+
+    if (program.url) { entry["url"] = program.url; }
+    if (program.media) { entry["media"] = program.media; }
+
+    rotonde["feed"].push(entry);
     fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
         if (err) { 
             console.error("err: couldn't save to", settings["rotonde location"]);
