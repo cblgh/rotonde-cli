@@ -7,7 +7,8 @@ var program = require("commander");
 var request = require("request");
 var util = require("./rotonde-utils.js");
 
-program.parse(process.argv);
+program.option("-u, --url", "show links in feed")
+    .parse(process.argv);
 
 var newest = 0; // keeps track of the newest post for further polling
 var maxPosts = program.args[0];
@@ -63,7 +64,11 @@ function processFeed() {
             var post = timeline[i];
             if (parseInt(post["entry"]["time"]) > parseInt(newest)) {
                 newest = post["entry"]["time"];
-                console.log(post["info"]["name"] + ": " + post["entry"]["text"]);
+                var output = post["info"]["name"] + ": " + post["entry"]["text"];
+                if (program.url && post["entry"]["url"]) {
+                    output += " " + post["entry"]["url"];
+                }
+                console.log(output);
             } 
         }
     });
