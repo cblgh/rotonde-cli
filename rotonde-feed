@@ -33,10 +33,8 @@ function processFeed() {
                     if (counter == rotonde["portal"].length - 1) {
                         resolve(posts);
                     }
-                } catch (err) {
-                    console.log(name);
-                    console.log(err);
-                    reject(err);
+                } catch (err) { // error parsing; just continue to next one
+                    console.log("parsing error with " + name);
                 }
             }
 
@@ -47,6 +45,8 @@ function processFeed() {
                 });
             });
         });
+    }).catch((err) => {
+        console.log("error", err);
     }).then((posts) => {
         var timeline = [];
         for (domain in posts) {
