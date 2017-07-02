@@ -7,6 +7,7 @@ var crypto = require("crypto");
 
 program
     .option("-u, --url [url]", "link to add to post")
+    .option("-f, --focus [focus]", "percentage time spent on task")
     .option("-m, --media [media]", "media to link to in post (jpg, mp3)")
     .parse(process.argv);
 
@@ -23,6 +24,7 @@ util.data().then((rotondeItems) => {
 
     if (program.url) { entry["url"] = program.url; }
     if (program.media) { entry["media"] = program.media; }
+    if (program.focus) { entry["focus"] = program.focus; }
 
     rotonde["feed"].push(entry);
     fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
