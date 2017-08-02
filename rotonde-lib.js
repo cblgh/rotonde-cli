@@ -2,14 +2,12 @@ var util = require("./rotonde-utils.js")
 var fs = require("fs")
 var crypto = require("crypto")
 module.exports = {
-    save: save,
+    save: save, // TODO
     write: write,
     delete: function() {},
     follow: follow, 
     unfollow: unfollow,
-    name: name,
-    color: color,
-    location: location
+    attribute: attribute
 }
 
 function save(rotondePath) {
@@ -26,14 +24,7 @@ function write(text, url, media, focus) {
         if (focus) { entry["focus"] = focus }
 
         rotonde["feed"].push(entry)
-        fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
-            if (err) { 
-                console.error("err: couldn't save to", settings["rotonde location"])
-                console.error(err)
-                return
-            }
-            console.log("the entry was published", text)
-        })
+        saveFile(settings, rotonde, "the entry was published " + text)
     })
 }
 
@@ -44,15 +35,9 @@ function follow(portal) {
             console.log("already following", portal)
             return
         }
-        rotonde["portal"].push(portal) // save the portal we want to follow
-        fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
-            if (err) { 
-                console.error("err: couldn't save portal to rotonde.json")
-                console.error(err)
-                return
-            }
-            console.log("now following", portal)
-        })
+        rotonde["portal"].push(portal) 
+        // save the portal we want to follow
+        util.saveFile(settings, rotonde, "now following " + portal)
     })
 }
 
@@ -64,23 +49,19 @@ function unfollow(portal) {
             console.log("err: you aren't following", portal)
             return
         }
-        rotonde["portal"].splice(rotonde["portal"].indexOf(portal), 1) // remove portal we want to unfollow
-        fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
-            if (err) { 
-                console.error("err: couldn't save to", settings["rotonde location"])
-                console.error(err)
-                return
-            }
-            console.log("no longer following", portal)
-        })
+        
+        // remove portal we want to unfollow
+        rotonde["portal"].splice(rotonde["portal"].indexOf(portal), 1) 
+        util.saveFile(settings, rotonde, "no longer following " + portal)
     })
 }
 
-function color(c) {
-}
-
-function name(n) {
-}
-
-function location(l) {
+// change an attribute of your rotonde portal
+// e.g. color, name, or location
+function attribute(attr, value) {
+    util.data().then((rotondeItems) => {
+        var [rotonde, settings] = rotondeItems;
+        rotonde["profile"][attr] = value;
+        util.saveFile(settings, rotonde, "your " + attr + " was changed to " + value)
+    })
 }

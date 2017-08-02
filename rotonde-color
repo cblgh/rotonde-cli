@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-var program = require("commander");
-var fs = require("fs");
+var rotonde = require("./rotonde-lib.js");
 var util = require("./rotonde-utils.js");
+var program = require("commander");
 
 program.parse(process.argv);
 
@@ -12,16 +12,4 @@ if (!color) {
     return;
 }
 
-util.data().then((rotondeItems) => {
-    var [rotonde, settings] = rotondeItems;
-    rotonde["profile"]["color"] = color;
-    fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
-        if (err) { 
-            console.error("err: couldn't save to", settings["rotonde location"]);
-            console.error(err);
-            return;
-        }
-        console.log("your color was changed to", color);
-    })
-})
-
+rotonde.attribute("color", color)

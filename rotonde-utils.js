@@ -3,6 +3,7 @@ var osenv = require("osenv");
 var path = require("path");
 
 module.exports = {
+    saveFile: saveFile,
     settings: readSettings,
     data: function() { 
         return readSettings().then((settings) => {
@@ -22,5 +23,17 @@ function readSettings() {
             if (err) { reject(err); }
             resolve(JSON.parse(data));
         })
+    })
+}
+
+// utility function to save em all
+function saveFile(settings, rotonde, successMsg) {
+    fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
+        if (err) { 
+            console.error("err: couldn't save to", settings["rotonde location"]);
+            console.error(err);
+            return;
+        }
+        console.log(successMsg);
     })
 }
