@@ -27,6 +27,13 @@ var rotondeStructure = {
 
 // save the location of your rotonde.json in a well-known config file ~/.config/.rotonde
 function save(rotondeFile) {
+    rotondeFile = path.resolve(rotondeFile)
+    var hasExt = path.extname(rotondeFile) === ".json"
+    console.log(hasExt)
+    if (!hasExt) {
+        rotondeFile = path.resolve(rotondeFile, "rotonde.json")
+    }
+    console.log(rotondeFile)
     return new Promise(function(resolve, reject) {
         var configdir = path.resolve(osenv.home(), ".config")
         // create ~/.config if it doesn't already exist
@@ -51,14 +58,14 @@ function save(rotondeFile) {
                 console.log("new location saved!")
                 // file already exists
             } else if (err.code == "ENOENT") {
-                console.log("no rotonde file at that location, creating one with the base structure...")
+                console.log("no rotonde file at %s, creating one with the base structure...", rotondeFile)
                 fs.writeFile(rotondeFile, JSON.stringify(rotondeStructure), function(err) {
                     if (err) {
                         console.log(err)
                         console.error("failed to create", rotondeFile)
                         return
                     }
-                    console.log("rotonde file created!")
+                    console.log("rotonde file %s created!", rotondeFile)
                 })
             } else {
                 console.log("err", err.code)
@@ -78,7 +85,7 @@ function write(text, url, media, focus) {
         if (focus) { entry["focus"] = focus }
 
         rotonde["feed"].push(entry)
-        saveFile(settings, rotonde, "the entry was published " + text)
+        util.saveFile(settings, rotonde, "the entry was published " + text)
     })
 }
 

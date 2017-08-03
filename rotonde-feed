@@ -16,7 +16,6 @@ if (!maxPosts) {
     maxPosts = 25;
 }
 
-
 function processFeed() {
     util.data()
     .then((rotondeItems) => {
