@@ -3,6 +3,7 @@ _nodejs-based cli for [Rotonde](https://github.com/Rotonde)_
 
 ### Instructions
 Download these files, make sure you have the latest [nodejs](https://nodejs.org/en/download/) version installed, navigate to the folder you unpacked these files and then do
+1. move to the folder you want to install in and do `git clone git@github.com:cblgh/rotonde-cli.git`
 1. `npm install`
 2. `./rotonde save /path/to/rotonde.json`
 3. `./rotonde write "started using rotonde"`
@@ -30,8 +31,8 @@ Usage: rotonde [options] [command]
     help [cmd]             display help for [cmd]
 ```
 
-#### More usage examples
-```
+### Usage examples
+```sh
 rotonde save /srv/http/rotonde/public/rotonde.json
 rotonde name "cblgh"
 rotonde location "the internet"
