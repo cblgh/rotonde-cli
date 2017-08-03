@@ -30,8 +30,8 @@ Usage: rotonde [options] [command]
     help [cmd]             display help for [cmd]
 ```
 
-#### More usage examples
-```
+### Usage examples
+```sh
 rotonde save /srv/http/rotonde/public/rotonde.json
 rotonde name "cblgh"
 rotonde location "the internet"
