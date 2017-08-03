@@ -1,62 +1,23 @@
 #!/usr/bin/env node
 
-var program = require("commander");
-var osenv = require("osenv");
-var fs = require("fs");
-var path = require("path");
+var rotonde = require("./rotonde-lib.js")
+var program = require("commander")
+var path = require("path")
 
-var rotondeStructure = {
-    "profile": {
-        "name": "void",
-        "location": "the lake of rotonde",
-        "color": "#000000"
-    },
-    "feed": [],
-    "portal": ["rotonde.cblgh.org", "rotonde.xxiivv.com"]
-}
+program.parse(process.argv)
 
-program.parse(process.argv);
-
-var location = program.args[0];
+var location = program.args[0]
 if (!location) {
-    console.log("please specify path to your rotonde.json file");
-    return;
+    console.log("please specify path to your rotonde.json file")
+    return
 }
 
 if (path.parse(location).ext) {
-    var rotondeFile = path.resolve(location);
+    var rotondeFile = path.resolve(location)
 } else {
-    location = path.resolve(location);
+    location = path.resolve(location)
     var rotondeFile = path.resolve(location, "rotonde.json")
 }
 
-console.log("saving the location of your rotonde file as", location + "...");
-
-return new Promise(function(resolve, reject) {
-    fs.writeFile(path.resolve(osenv.home(), ".config", ".rotonde"), JSON.stringify({"rotonde location": rotondeFile}), function(err) {
-        if (err) {
-            console.error("failed to create settings file");
-        }
-        console.log("location remembered!");
-        resolve();
-    });
-})
-.then(function() {
-    fs.stat(rotondeFile, function(err, stat) {
-        if (err == null) {
-            // file already exists
-        } else if (err.code == "ENOENT") {
-            console.log("no rotonde file at that location, creating one with the base structure...")
-            fs.writeFile(rotondeFile, JSON.stringify(rotondeStructure), function(err) {
-                if (err) {
-                    console.log(err);
-                    console.error("failed to create", rotondeFile);
-                    return;
-                }
-                console.log("rotonde file created!");
-            });
-        } else {
-            console.log("err", err.code);
-        }
-    });
-});
+console.log("saving the location of your rotonde file as", location + "...")
+rotonde.save(rotondeFile)

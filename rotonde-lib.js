@@ -1,16 +1,70 @@
 var util = require("./rotonde-utils.js")
 var fs = require("fs")
 var crypto = require("crypto")
+var osenv = require("osenv")
+var path = require("path")
+var mkdirp = require("mkdirp")
+
 module.exports = {
-    save: save, // TODO
+    save: save, 
     write: write,
-    delete: function() {},
+    delete: function() {}, // empty for now, current impl is so-so
     follow: follow, 
     unfollow: unfollow,
     attribute: attribute
 }
 
-function save(rotondePath) {
+// default json structure
+var rotondeStructure = {
+    "profile": {
+        "name": "void",
+        "location": "the lake of rotonde",
+        "color": "#000000"
+    },
+    "feed": [],
+    "portal": ["rotonde.cblgh.org", "rotonde.xxiivv.com"]
+}
+
+// save the location of your rotonde.json in a well-known config file ~/.config/.rotonde
+function save(rotondeFile) {
+    return new Promise(function(resolve, reject) {
+        var configdir = path.resolve(osenv.home(), ".config")
+        // create ~/.config if it doesn't already exist
+        mkdirp.sync(configdir)
+        // write to the config file ~/.config/.rotonde
+        fs.writeFile(path.resolve(configdir, ".rotonde"), JSON.stringify({"rotonde location": rotondeFile}), function(err) {
+            if (err) {
+                console.error("failed to create config file!")
+                reject()
+            } 
+            resolve()
+        })
+    })
+    .catch(function(err) {
+        console.log(err)
+        console.log("terminating due to error :<")
+        process.exit()
+    })
+    .then(function() {
+        fs.stat(rotondeFile, function(err, stat) {
+            if (err == null) {
+                console.log("new location saved!")
+                // file already exists
+            } else if (err.code == "ENOENT") {
+                console.log("no rotonde file at that location, creating one with the base structure...")
+                fs.writeFile(rotondeFile, JSON.stringify(rotondeStructure), function(err) {
+                    if (err) {
+                        console.log(err)
+                        console.error("failed to create", rotondeFile)
+                        return
+                    }
+                    console.log("rotonde file created!")
+                })
+            } else {
+                console.log("err", err.code)
+            }
+        })
+    })
 }
 
 function write(text, url, media, focus) {
@@ -60,8 +114,8 @@ function unfollow(portal) {
 // e.g. color, name, or location
 function attribute(attr, value) {
     util.data().then((rotondeItems) => {
-        var [rotonde, settings] = rotondeItems;
-        rotonde["profile"][attr] = value;
+        var [rotonde, settings] = rotondeItems
+        rotonde["profile"][attr] = value
         util.saveFile(settings, rotonde, "your " + attr + " was changed to " + value)
     })
 }
