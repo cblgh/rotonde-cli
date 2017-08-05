@@ -2,7 +2,9 @@ var fs = require("fs");
 var osenv = require("osenv");
 var path = require("path");
 
+var rotondedir = path.resolve(osenv.home(), ".config", "rotonde")
 module.exports = {
+    dir: rotondedir,
     saveFile: saveFile,
     settings: readSettings,
     data: function() { 
@@ -19,7 +21,7 @@ module.exports = {
 
 function readSettings() {
     return new Promise((resolve, reject) => {
-        fs.readFile(path.resolve(osenv.home(), ".config", ".rotonde"), (err, data) => {
+        fs.readFile(path.resolve(rotondedir, ".rotonde"), function(err, data) {
             if (err) { reject(err); }
             resolve(JSON.parse(data));
         })

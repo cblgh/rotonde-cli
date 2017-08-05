@@ -1,7 +1,6 @@
 var util = require("./rotonde-utils.js")
 var fs = require("fs")
 var crypto = require("crypto")
-var osenv = require("osenv")
 var path = require("path")
 var mkdirp = require("mkdirp")
 
@@ -29,17 +28,14 @@ var rotondeStructure = {
 function save(rotondeFile) {
     rotondeFile = path.resolve(rotondeFile)
     var hasExt = path.extname(rotondeFile) === ".json"
-    console.log(hasExt)
     if (!hasExt) {
         rotondeFile = path.resolve(rotondeFile, "rotonde.json")
     }
-    console.log(rotondeFile)
     return new Promise(function(resolve, reject) {
-        var configdir = path.resolve(osenv.home(), ".config")
-        // create ~/.config if it doesn't already exist
-        mkdirp.sync(configdir)
+        // create ~/.config/rotonde if it doesn't already exist
+        mkdirp.sync(util.dir)
         // write to the config file ~/.config/.rotonde
-        fs.writeFile(path.resolve(configdir, ".rotonde"), JSON.stringify({"rotonde location": rotondeFile}), function(err) {
+        fs.writeFile(path.resolve(util.dir, ".rotonde"), JSON.stringify({"rotonde location": rotondeFile}), function(err) {
             if (err) {
                 console.error("failed to create config file!")
                 reject()
