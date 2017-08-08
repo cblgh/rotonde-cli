@@ -21,7 +21,7 @@ module.exports = {
 }
 
 function readSettings() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         fs.readFile(path.resolve(rotondedir, ".rotonde"), function(err, data) {
             if (err) { reject(err) }
             resolve(JSON.parse(data))
@@ -40,12 +40,15 @@ function saveSettings(settings) {
 
 // utility function to save em all
 function saveFile(settings, rotonde, successMsg) {
-    fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
-        if (err) { 
-            console.error("err: couldn't save to", settings["rotonde location"])
-            console.error(err)
-            return
-        }
-        console.log(successMsg)
+    return new Promise(function (resolve, reject) {
+        fs.writeFile(settings["rotonde location"], JSON.stringify(rotonde), function(err) {
+            if (err) { 
+                console.error("err: couldn't save to", settings["rotonde location"])
+                console.error(err)
+                reject(err)
+            }
+            console.log(successMsg)
+            resolve()
+        })
     })
 }

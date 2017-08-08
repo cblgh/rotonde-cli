@@ -71,7 +71,7 @@ function save(rotondeFile) {
 }
 
 function write(text, url, media, focus) {
-    util.data().then((rotondeItems) => {
+    return util.data().then((rotondeItems) => {
         var [rotonde, settings] = rotondeItems
         var hash = crypto.createHash("sha256").update(text).digest("hex")
         var entry = {"text": text, "time": parseInt((new Date).getTime() / 1000), "id": hash}
@@ -81,12 +81,12 @@ function write(text, url, media, focus) {
         if (focus) { entry["focus"] = focus }
 
         rotonde["feed"].push(entry)
-        util.saveFile(settings, rotonde, "the entry was published " + text)
+        return util.saveFile(settings, rotonde, "the entry was published " + text)
     })
 }
 
 function follow(portal) {
-    util.data().then((rotondeItems) => {
+    return util.data().then((rotondeItems) => {
         var [rotonde, settings] = rotondeItems
         if (rotonde["portal"].indexOf(portal) >= 0) {
             console.log("already following", portal)
@@ -94,12 +94,12 @@ function follow(portal) {
         }
         rotonde["portal"].push(portal) 
         // save the portal we want to follow
-        util.saveFile(settings, rotonde, "now following " + portal)
+        return util.saveFile(settings, rotonde, "now following " + portal)
     })
 }
 
 function unfollow(portal) {
-    util.data().then((rotondeItems) => {
+    return util.data().then((rotondeItems) => {
         var [rotonde, settings] = rotondeItems
         var index = rotonde["portal"].indexOf(portal)
         if (index < 0) {
@@ -109,16 +109,16 @@ function unfollow(portal) {
         
         // remove portal we want to unfollow
         rotonde["portal"].splice(rotonde["portal"].indexOf(portal), 1) 
-        util.saveFile(settings, rotonde, "no longer following " + portal)
+        return util.saveFile(settings, rotonde, "no longer following " + portal)
     })
 }
 
 // change an attribute of your rotonde portal
 // e.g. color, name, or location
 function attribute(attr, value) {
-    util.data().then((rotondeItems) => {
+    return util.data().then((rotondeItems) => {
         var [rotonde, settings] = rotondeItems
         rotonde["profile"][attr] = value
-        util.saveFile(settings, rotonde, "your " + attr + " was changed to " + value)
+        return util.saveFile(settings, rotonde, "your " + attr + " was changed to " + value)
     })
 }
