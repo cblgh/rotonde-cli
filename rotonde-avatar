@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+var rotonde = require("./rotonde-lib.js");
+var util = require("./rotonde-utils.js");
+var program = require("commander");
+
+program.parse(process.argv);
+
+var avatar = program.args[0];
+if (!avatar) {
+    console.error("error: specify an url to set for your profile avatar");
+    return;
+}
+
+rotonde.attribute("avatar", avatar)
