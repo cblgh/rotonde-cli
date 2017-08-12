@@ -13,29 +13,19 @@ module.exports = {
     attribute: attribute
 }
 
-// default json structure
-var rotondeStructure = {
-    "profile": {
-        "name": "void",
-        "location": "the lake of rotonde",
-        "color": "#000000"
-    },
-    "feed": [],
-    "portal": ["rotonde.cblgh.org", "rotonde.xxiivv.com"]
-}
 
 // save the location of your rotonde.json in a well-known config file ~/.config/.rotonde
-function save(rotondeFile) {
-    rotondeFile = path.resolve(rotondeFile)
-    var hasExt = path.extname(rotondeFile) === ".json"
+function save(rotondefile) {
+    rotondefile = path.resolve(rotondefile)
+    var hasExt = path.extname(rotondefile) === ".json"
     if (!hasExt) {
-        rotondeFile = path.resolve(rotondeFile, "rotonde.json")
+        rotondefile = path.resolve(rotondefile, "rotonde.json")
     }
     return new Promise(function(resolve, reject) {
         // create ~/.config/rotonde if it doesn't already exist
         mkdirp.sync(util.dir)
         // write to the config file ~/.config/.rotonde
-        fs.writeFile(path.resolve(util.dir, ".rotonde"), JSON.stringify({"rotonde location": rotondeFile}), function(err) {
+        fs.writeFile(path.resolve(util.dir, ".rotonde"), JSON.stringify({"rotonde location": rotondefile}), function(err) {
             if (err) {
                 console.error("failed to create config file!")
                 reject()
@@ -49,24 +39,8 @@ function save(rotondeFile) {
         process.exit()
     })
     .then(function() {
-        fs.stat(rotondeFile, function(err, stat) {
-            if (err == null) {
-                console.log("new location saved!")
-                // file already exists
-            } else if (err.code == "ENOENT") {
-                console.log("no rotonde file at %s, creating one with the base structure...", rotondeFile)
-                fs.writeFile(rotondeFile, JSON.stringify(rotondeStructure), function(err) {
-                    if (err) {
-                        console.log(err)
-                        console.error("failed to create", rotondeFile)
-                        return
-                    }
-                    console.log("rotonde file %s created!", rotondeFile)
-                })
-            } else {
-                console.log("err", err.code)
-            }
-        })
+        // creates a base rotonde.json unless one already exists
+        util.createJsonBase(rotondefile)
     })
 }
 
