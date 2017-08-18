@@ -75,7 +75,7 @@ function readSettings() {
                     mkdirp.sync(rotondedir)
 
                     // write the default settings to ~/.config/rotonde/.rotonde
-                    var rotondefile = path.resolve("rotonde.json")
+                    var rotondefile = path.resolve(rotondedir, ".rotonde", "rotonde.json")
                     var defaults = {"rotonde location": rotondefile}
                     createDefaultJson(rotondefile).then(function() {
                             resolve(defaults)
