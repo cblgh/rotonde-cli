@@ -46,14 +46,14 @@ function createDefaultJson(rotondefile) {
                     if (err) {
                         console.log(err)
                         console.error("failed to create", rotondefile)
-                        reject(err)
+                        return reject(err)
                     }
                     console.log("rotonde file %s created!", rotondefile)
                     resolve();
                 })
             } else {
                 console.log("err", err.code)
-                reject(err)
+                return reject(err)
             }
         })
     })
@@ -62,7 +62,8 @@ function createDefaultJson(rotondefile) {
 // creating a default config if none exists
 function readSettings() {
     return new Promise(function (resolve, reject) {
-        fs.readFile(path.resolve(rotondedir, ".rotonde"), function(err, data) {
+        var settingsFile = path.resolve(rotondedir, ".rotonde")
+        fs.readFile(settingsFile, function(err, data) {
         // if readSettings fails due to no ~/.config/rotonde or ~/.config/rotonde/.rotonde
         // then we create it, set its contents to defaults and return the defaults.
         // we set initial rotonde location to the current directory
@@ -71,14 +72,25 @@ function readSettings() {
                 if (err.code === "ENOENT") {
                     console.log("no such file or folder!!")
                     console.log("create .rotonde with the defaults:)")
+
                     // create the folder structure 
                     mkdirp.sync(rotondedir)
 
-                    // write the default settings to ~/.config/rotonde/.rotonde
                     var rotondefile = path.resolve(rotondedir, "rotonde.json")
                     var defaults = {"rotonde location": rotondefile}
-                    createDefaultJson(rotondefile).then(function() {
-                            resolve(defaults)
+
+                    // write the default settings to ~/.config/rotonde/.rotonde
+                    fs.writeFile(settingsFile, JSON.stringify(defaults), function(err) {
+                        if (err) {
+                            console.log(err)
+                            console.error("failed to create", settingsFile)
+                            return reject(err)
+                        }
+                        console.log(".rotonde created at %s!", rotondefile)
+                        // create the rotonde.json file
+                        createDefaultJson(rotondefile).then(function() {
+                                resolve(defaults)
+                        })
                     })
                 }
             } else {
